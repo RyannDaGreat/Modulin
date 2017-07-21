@@ -17,12 +17,12 @@ public class SynthEngine//I make the sound on the speakers. roar :}
     public static final boolean saveOutputFile=PropertyGetter.getSaveOutputFile();//If this changes during runtime, sometimes the SynthEngine will write to byteHistory and sometimes it wont - leaving gaps in the audio file if it's true by the time it finishes
     public static String outputFilePath=PropertyGetter.getOutputFilePath();
     public static AudioFileFormat.Type outputFileType=AudioFileFormat.Type.WAVE;//I think this will always be set to WAVE...all the other choices seem useless.
-    public static boolean mustMaintainTempo=true;//UserInput++ false ⟹ smoother sound but incorrect tempo. If set to true, it means if the buffers lag it will keep its tempo anyway, even though it means the buffers will be out of sync (and so it will sound noisy)
+    public static boolean mustMaintainTempo=PropertyGetter.getMustMaintainTempo();//UserInput++ false ⟹ smoother sound but incorrect tempo. If set to true, it means if the buffers lag it will keep its tempo anyway, even though it means the buffers will be out of sync (and so it will sound noisy)
     public static final int SAMPLE_RATE=PropertyGetter.getSampleRate();
     private static final int ↈbitsPerSample=PropertyGetter.getBitsPerSample();//UserInput++ LIMITED CHOICES: You can only have either 8-bit or 16-bit audio. ↈbitsPerSample ∈ {8，16}  (8⟷Byte，16⟷Short，32⟷Int. It appears that, for some reason, trying to use 32 bit causes some audio error. I don't know why.)
     public static long getCurrentↈSamples()
     {
-        return currentSampleNumber;
+        return currentSampleNumber;//You can read this variable...but certainly it would be a TERRIBLE idea to let the user WRITE to this it because that could let them cause a negative change in time, which would break some of the Temporal LinearModules such as Legato or SampleRate (which are coded with the assumption that time never goes backwards).
     }
     public static double getCurrentTime()
     {

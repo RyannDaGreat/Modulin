@@ -1,5 +1,5 @@
 package Synth;//Created by Ryan on 7/20/17.
-import Resources.ResourceGetter;
+import Common.ResourceGetter;
 public class PropertyGetter
 {
     private static String getProperty(String propertyName)
