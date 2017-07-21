@@ -14,11 +14,12 @@ public class SynthEngine//I make the sound on the speakers. roar :}
 {
     public static LinearModule audioModule=new Constant(0);
     public static LinearModule crossFadeProportion=new Constant(1);//<-- Can't tell the difference whether it's 0 or 1. Should be between 0 and 1; anything outside of that range will be clamped. A bit low level; this determines how much of the bufferBytes should be cross-faded into a newly created bufferBytes after repeating when it lags (to avoid hearing a popping sound).
-    public static String outputFilePath="/Users/Ryan/Desktop/test.wav";//Set to null if you don't want to save any files. The file will be saved as you exit the java program via a shutdown hook.
-    public static AudioFileFormat.Type outputFileType=AudioFileFormat.Type.WAVE;
+    public static final boolean saveOutputFile=PropertyGetter.getSaveOutputFile();//If this changes during runtime, sometimes the SynthEngine will write to byteHistory and sometimes it wont - leaving gaps in the audio file if it's true by the time it finishes
+    public static String outputFilePath=PropertyGetter.getOutputFilePath();
+    public static AudioFileFormat.Type outputFileType=AudioFileFormat.Type.WAVE;//I think this will always be set to WAVE...all the other choices seem useless.
     public static boolean mustMaintainTempo=true;//UserInput++ false ⟹ smoother sound but incorrect tempo. If set to true, it means if the buffers lag it will keep its tempo anyway, even though it means the buffers will be out of sync (and so it will sound noisy)
-    public static final int SAMPLE_RATE=44100;
-    private static final int ↈbitsPerSample=16;//UserInput++ LIMITED CHOICES: You can only have either 8-bit or 16-bit audio. ↈbitsPerSample ∈ {8，16}  (8⟷Byte，16⟷Short，32⟷Int. It appears that, for some reason, trying to use 32 bit causes some audio error. I don't know why.)
+    public static final int SAMPLE_RATE=PropertyGetter.getSampleRate();
+    private static final int ↈbitsPerSample=PropertyGetter.getBitsPerSample();//UserInput++ LIMITED CHOICES: You can only have either 8-bit or 16-bit audio. ↈbitsPerSample ∈ {8，16}  (8⟷Byte，16⟷Short，32⟷Int. It appears that, for some reason, trying to use 32 bit causes some audio error. I don't know why.)
     public static long getCurrentↈSamples()
     {
         return currentSampleNumber;
@@ -74,7 +75,7 @@ public class SynthEngine//I make the sound on the speakers. roar :}
         {
             line.write(bytes,0,bufferↈBytes);
             //noinspection ConstantConditions
-            if(outputFilePath!=null)//If we're planning on saving a file
+            if(saveOutputFile)//If we're planning on saving a file
             {
                 try
                 {
@@ -169,7 +170,7 @@ public class SynthEngine//I make the sound on the speakers. roar :}
                            }
                        }).start();
             //noinspection ConstantConditions
-            if(outputFilePath!=null)//The user wishes to save some file
+            if(saveOutputFile)//The user wishes to save some file
             {
                 Runtime.getRuntime().addShutdownHook(new Thread(SynthEngine::saveAudioFile));
             }
